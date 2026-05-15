@@ -1,6 +1,11 @@
 import mongoose from "mongoose"
+import dotenv from "dotenv";
+
+dotenv.config();
 let error=null
-await mongoose.connect('mongodb+srv://vgarg3613_db_user:vivek1234@vivekcluster.adohbuk.mongodb.net/?appName=VivekCluster').then(()=>{console.log('your data base connected successfully')}).catch(
+console.log(process.env.MONGODB_URL)
+
+await mongoose.connect(process.env.MONGODB_URL).then(()=>{console.log('your data base connected successfully')}).catch(
 e=>{console.log(e)
     error=e
 })

@@ -1,14 +1,31 @@
 import { User, Hotels, Image } from "./model/AllSchema.js"
+import bcrypt from "bcrypt";
 export const check_user=async(req,res)=>{
     try{
-        const obj_data=req.body
-        const result= await User.findOne(obj_data)
-        console.log(result)
-        if (result != null) {
-            return res.status(200).json(result);
-        } else {
-            return res.status(404).json({ message: "User not found" });
+        const {email,password}=req.body
+        const result= await User.findOne({email})
+        console.log(result.password)
+
+        if (!result){
+            return res.status(404).json({message:'user not found'})
         }
+        const isMatch= await bcrypt.compare(
+            password,
+            result.password
+        )
+        console.log(isMatch)
+        if (!isMatch){
+            return res.status(401).json({message:'invalid password'})
+        }
+
+        console.log('report ok')
+
+        return res.status(200).json({
+            message: "Login successful",
+            user: result
+            });
+
+
     }catch(e){
         console.log(e)  
         return res.status(500).json({message:'Server error'})
@@ -38,6 +55,7 @@ export const ReturnImage= async (req,res)=>{
 }
 
 export const create_user=async(req,res)=>{
+    req.body.password=await bcrypt.hash(req.body.password,10)
     try {
     const savedUser = await User.create(req.body);
     
